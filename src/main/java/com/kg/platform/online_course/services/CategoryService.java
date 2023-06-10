@@ -1,0 +1,90 @@
+package com.kg.platform.online_course.services;
+
+import jakarta.transaction.Transactional;
+import com.kg.platform.online_course.dto.response.AllCategoriesResponses;
+import com.kg.platform.online_course.dto.response.CategoryResponse;
+import com.kg.platform.online_course.mappers.CategoryMapper;
+import com.kg.platform.online_course.models.Category;
+import com.kg.platform.online_course.models.Image;
+import com.kg.platform.online_course.repositories.CategoryRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.webjars.NotFoundException;
+
+import java.util.List;
+
+@Service
+@AllArgsConstructor
+public class CategoryService {
+    private final CategoryRepository categoryRepository;
+    private final ProductService productService;
+    private CategoryMapper categoryMapper;
+
+
+    @Transactional
+    public List<CategoryResponse> getCategories(Category parenCategory) {
+        if (parenCategory == null) {
+            return categoryRepository.findAllByParentCategoryIsNull()
+                    .stream()
+                    .map(categoryMapper::toCategoryResponse)
+                    .toList();
+        }
+        return categoryRepository.getCategoriesByParentCategoryId(parenCategory.getId())
+                .stream()
+                .map(categoryMapper::toCategoryResponse)
+                .toList();
+
+    }
+    @Transactional
+    public List<CategoryResponse> getSubCategories(Long parentCategoryId) {
+        return categoryRepository.getCategoriesByParentCategoryId(parentCategoryId)
+                .stream().map(categoryMapper::toCategoryResponse).toList();
+    }
+
+    @Transactional
+    public void create(Long parentId, String name, MultipartFile file) {
+        Category parentCategory = categoryRepository.findById(parentId).orElse(null);
+        Image image = file != null ? Image.parseImage(file) : null;
+
+        Category category = Category.builder()
+                .categoryName(name)
+                .image(image)
+                .parentCategory(parentCategory)
+                .build();
+
+        categoryRepository.save(category);
+
+    }
+
+    @Transactional
+    public void update(Long categoryId, String categoryName, MultipartFile file) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("Not found"));
+        category.setCategoryName(categoryName);
+
+        if (file != null) category.setImage(Image.parseImage(file));
+
+        categoryRepository.save(category);
+    }
+
+    @Transactional
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Not found"));
+        if (category.getParentCategory() != null) {
+            category.getProducts().forEach(p -> productService.deleteById(p.getId()));
+        } else {
+            category.getCategories().forEach(c ->
+                    c.getProducts().forEach(p -> productService.deleteById(p.getId()))
+            );
+        }
+        categoryRepository.delete(category);
+    }
+
+    @Transactional
+    public List<AllCategoriesResponses> getAllCategoriesWithSubs() {
+        List<Category> categories = categoryRepository.findAll();
+        return categoryMapper.mapToAllCategoriesResponses(categories);
+    }
+
+
+}
