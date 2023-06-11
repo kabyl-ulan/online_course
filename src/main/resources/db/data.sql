@@ -3,14 +3,14 @@ insert into users (id, email, name, surname, password, phone_number, role) VALUE
                                                                                (2, 'client@gmail.com', 'Client', 'Clientov', '$2a$12$PhRg1tBOK9sA2A8gEa4JZ.lF6yWI5/KKg38CkmNsOSTFWQekA72Y6', '0702010101', 'USER');
 
 insert into categories (id, category_name, parent_category_id) VALUES
-                                                                   (1, 'electronic', null),
-                                                                   (2, 'mobile phone', 1),
-                                                                   (3, 'laptop', 1),
-                                                                   (4, 'TV',1),
-                                                                   (5, 'appliances', null),
-                                                                   (6, 'refrigerator', 5),
-                                                                   (7, 'плитка', 5),
-                                                                   (8, 'фен', 5);
+                                                                   (1, 'Backend', null),
+                                                                   (2, 'Java', 1),
+                                                                   (3, 'Python', 1),
+                                                                   (4, 'Node',1),
+                                                                   (5, 'Frontend', null),
+                                                                   (6, 'React', 5),
+                                                                   (7, 'TypeScript', 5),
+                                                                   (8, 'Angular', 5);
 
 insert into products (id, amount, description, price, product_name, category_id) VALUES
                                                                                      (1, 5, 'Iphone 14 pro 256g', 1000, 'Iphone 14', 2),
