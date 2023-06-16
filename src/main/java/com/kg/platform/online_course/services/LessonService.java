@@ -1,6 +1,5 @@
 package com.kg.platform.online_course.services;
 
-import com.kg.platform.online_course.dto.request.LessonRequest;
 import com.kg.platform.online_course.dto.response.LessonResponse;
 import com.kg.platform.online_course.exceptions.NotFoundException;
 import com.kg.platform.online_course.mappers.LessonsMapper;
@@ -11,41 +10,65 @@ import com.kg.platform.online_course.repositories.LessonRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
 @AllArgsConstructor
 public class LessonService {
-    private LessonRepository repository;
+    private LessonRepository lessonRepository;
     private LessonsMapper lessonsMapper;
     private CourseRepository courseRepository;
-    public void uploadLesson(LessonRequest request){
+    private VideoService videoService;
 
-        Course course = courseRepository.findById(request.getCourseId()).get();
-        Lesson lesson = lessonsMapper.toLesson(request);
+    public LessonResponse uploadLesson(Long courseId, String title, MultipartFile file){
+
+        Course course = courseRepository.findById(courseId).get();
+
+        Lesson lesson = new Lesson();
+        lesson.setTitle(title);
+        lesson.setCourse(course);
+
         course.getLessons().add(lesson);
 
+        lessonRepository.save(lesson);
         courseRepository.save(course);
+
+        videoService.saveVideo(course.getCourseName(),lesson.getId(),file);
+
+        return lessonsMapper.toLessonResponse(lesson);
     }
 
     public LessonResponse getById(Long id) {
-        Lesson lesson = repository.findById(id).orElseThrow(NotFoundException::new);
+        Lesson lesson = lessonRepository.findById(id).orElseThrow(NotFoundException::new);
         return lessonsMapper.toLessonResponse(lesson);
     }
 
     public List<LessonResponse> getLessonsByCourseId(Long courseId) {
-        return repository.findByCourseId(courseId)
+        return lessonRepository.findByCourseId(courseId)
                 .stream()
                 .map(lessonsMapper::toLessonResponse)
                 .toList();
     }
 
     public void deleteById(Long id) {
-        repository.deleteById(id);
+        Lesson lesson = lessonRepository.findById(id).orElseThrow(NotFoundException::new);
+        videoService.deleteVideoById(lesson.getVideo().getId());
+        lessonRepository.delete(lesson);
+    }
+
+    public LessonResponse updateById(Long lessonId, String title, MultipartFile file) {
+        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(NotFoundException::new);
+        lesson.setTitle(title);
+        if (file != null && !file.isEmpty()) {
+            String courseName = lesson.getCourse().getCourseName();
+
+            videoService.saveVideo(courseName,lessonId,file);
+        }
+        lessonRepository.save(lesson);
+
+        return lessonsMapper.toLessonResponse(lesson);
     }
 }

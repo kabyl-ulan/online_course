@@ -31,42 +31,36 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @Tag(name = "Course API", description = "The Course API  ")
 public class CourseController {
     private final CourseService courseService;
-    private VideoController videoController;
 
 
     @Operation(summary = "Get main page",
-            description = "This endpoint returns a list of popular and most sold products")
+            description = "This endpoint returns a list of popular and most sold courses")
     @GetMapping
     public Map<String, List<ProductResponse>> getMainPage() {
         return courseService.getMainPage();
     }
 
     @Operation(summary = "Post the new product",
-            description = "This endpoint returns a new created product with all products")
+            description = "This endpoint returns a new created product with all courses")
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @PostMapping(path = "/add")
-    public SimpleResponse addProduct(@RequestBody CourseCreateRequest request) {
+    public CourseDetailsResponse addProduct(@RequestBody CourseCreateRequest request) {
         return courseService.create(request);
     }
 
-    @Operation(summary = "Add image to product",
-            description = "This endpoint returns a new created product with all products")
+    @Operation(summary = "Add image to course",
+            description = "This endpoint returns course with added image")
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @PostMapping(path = "/{id}/add-image", consumes = {"multipart/form-data"})
     public ResponseEntity<CourseDetailsResponse> addImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         return new ResponseEntity<>(courseService.addImage(id, file), HttpStatus.OK);
     }
 
-    @Operation(summary = "Delete image from product", description = "This endpoint delete image from product")
-    @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
-    @DeleteMapping(path = "/{id}/delete")
-    public ResponseEntity<CourseDetailsResponse> deleteImage(@PathVariable(name = "id") Long productId, Long imageId) {
-        return new ResponseEntity<>(courseService.deleteImage(productId, imageId), HttpStatus.OK);
-    }
+
 
 
     @Operation(summary = "Get all products",
-            description = "This endpoint returns all course by catetory")
+            description = "This endpoint returns all course by category")
     @GetMapping("/get-all/{categoryId}")
     public Page<ProductResponse> getCourseByCategoryId(
             @PathVariable Long categoryId,
@@ -99,7 +93,7 @@ public class CourseController {
         return courseService.deleteById(id);
     }
 
-    @Operation(summary = "Search by product name or description",
+    @Operation(summary = "Search by course name or description",
             description = "This endpoint returns a searched courses by name and desc in  specified category " +
                     "if category id is present otherwise search globally in db")
     @GetMapping("/search")

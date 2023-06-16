@@ -7,6 +7,7 @@ import com.kg.platform.online_course.repositories.LessonRepository;
 import com.kg.platform.online_course.repositories.VideoRepository;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,9 +26,10 @@ import java.util.List;
 @AllArgsConstructor
 @Transactional
 public class VideoService {
-    private static final String UPLOAD_DIR = "./uploads"; // Directory to store uploaded videos
+
     private VideoRepository videoRepository;
     private LessonRepository lessonRepository;
+    private final String UPLOAD_DIR="./uploads";
 
     @PostConstruct
     public void init() {
@@ -35,15 +37,14 @@ public class VideoService {
                 new File(UPLOAD_DIR).mkdir();
         }
     }
+
+    @SneakyThrows
     @Async
-    public void saveVideo(String courseName, Long lessonId, MultipartFile file) throws IOException {
+    public void saveVideo(String courseName, Long lessonId, MultipartFile file)  {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
         // Save the video file to the upload directory
         String uploadPath = UPLOAD_DIR + "/" +courseName;
-        File dir = new File(uploadPath);
 
-        if (!dir.exists())
-            dir.mkdir();
 
         Path path = Path.of(uploadPath + "/" +  filename);
         file.transferTo(path);
@@ -52,12 +53,19 @@ public class VideoService {
         Lesson lesson = lessonRepository.findById(lessonId).get();
 
         Video video = new Video();
-        video.setPath(path.toString());
+        Path fullPath = Path.of(uploadPath + "/" + filename).toAbsolutePath();
 
+        video.setPath(fullPath.toString());
+        video.setLesson(lesson);
         lesson.setVideo(video);
+
+
         lessonRepository.save(lesson);
 
     }
+
+
+
 
     @SneakyThrows
     public void deleteVideoById(Long id) {
@@ -71,14 +79,11 @@ public class VideoService {
 
     }
 
-    public Video getVideoById(Long id) {
-        // Retrieve video by ID from the repository
-        return videoRepository.findById(id).orElse(null);
-    }
-
-    public List<String> getAllVideoNames() {
-        // Retrieve all video names from the repository
-        List<Video> videos = videoRepository.findAll();
-        return videos.stream().map(Video::getPath).toList();
-    }
+//    public void updateVideo(Lesson lesson,MultipartFile file) {
+//        Video video = lesson.getVideo();
+//
+//        deleteVideoById(lesson.getVideo().getId());
+//
+//
+//    }
 }

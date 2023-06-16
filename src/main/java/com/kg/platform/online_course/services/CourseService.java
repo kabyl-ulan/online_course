@@ -1,24 +1,28 @@
 package com.kg.platform.online_course.services;
 
-import com.kg.platform.online_course.api_controller.VideoController;
 import com.kg.platform.online_course.dto.request.CourseCreateRequest;
 import com.kg.platform.online_course.dto.request.CourseUpdateRequest;
 import com.kg.platform.online_course.dto.response.CourseDetailsResponse;
 import com.kg.platform.online_course.dto.response.ProductResponse;
-import com.kg.platform.online_course.dto.response.SimpleResponse;
 import com.kg.platform.online_course.mappers.CourseMapper;
 import com.kg.platform.online_course.models.Category;
 import com.kg.platform.online_course.models.Course;
 import com.kg.platform.online_course.models.Image;
-import com.kg.platform.online_course.repositories.*;
+import com.kg.platform.online_course.repositories.CategoryRepository;
+import com.kg.platform.online_course.repositories.CourseRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.webjars.NotFoundException;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,18 +34,23 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
     private final CategoryRepository categoryRepository;
-    private final CartItemRepository cartItemRepository;
-    private final OrderItemRepository orderItemRepository;
-    private final ImageRepository imageRepository;
 
-    private final VideoController videoController;
 
-    public SimpleResponse create(CourseCreateRequest request) {
+    private final String UPLOAD_DIR="./uploads";
+    public CourseDetailsResponse create(CourseCreateRequest request) {
         Course course = new Course(request);
         Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() -> new NotFoundException("The category not found"));
+
         course.setCategory(category);
         courseRepository.save(course);
-        return new SimpleResponse("Successfully added", "SAVE");
+
+        String uploadPath = UPLOAD_DIR + "/" +request.getCourseName();
+        File dir = new File(uploadPath);
+
+        if (!dir.exists())
+            dir.mkdir();
+
+        return courseMapper.toCourseDetailsResponse(course);
     }
 
 
@@ -67,7 +76,7 @@ public class CourseService {
         Pageable pageable = Pageable.unpaged();
         Course course = courseRepository.findById(id).orElseThrow(() -> new NotFoundException("Not found"));
 
-
+        deleteCourseDirectory(Path.of("./uploads/" + course.getCourseName()));
         courseRepository.delete(course);
         return getAllProductsByCategoryId(course.getCategory().getId(), pageable);
     }
@@ -121,6 +130,29 @@ public class CourseService {
             return courseRepository.findByCourseNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(name, name, pageable).map(courseMapper::toProductResponse);
         } else {
             return courseRepository.findByCourseNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndCategoryId(name, name, categoryId, pageable).map(courseMapper::toProductResponse);
+        }
+    }
+
+    public  void deleteCourseDirectory(Path directory){
+        try {
+
+            // Delete all files within the directory
+            Files.walk(directory)
+                    .filter(Files::isRegularFile)
+                    .forEach(file -> {
+                        try {
+                            Files.delete(file);
+                        } catch (IOException e) {
+                            System.out.println("Error deleting file: " + file.toString());
+                        }
+                    });
+
+            // Delete the empty directory
+            Files.delete(directory);
+
+            System.out.println("Directory deleted successfully.");
+        } catch (IOException e) {
+            System.out.println("Error deleting the directory: " + e.getMessage());
         }
     }
 }
