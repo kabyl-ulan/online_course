@@ -15,8 +15,10 @@ public class Lesson {
     @Id
     private Long id;
     private String title;
-    @OneToOne
+
+    @OneToOne(cascade = CascadeType.ALL)
     private Video video;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn()
     private Course course;

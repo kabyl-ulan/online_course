@@ -13,5 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class LessonRequest {
     private String title;
     private Long courseId;
+    private MultipartFile file;
 
 }

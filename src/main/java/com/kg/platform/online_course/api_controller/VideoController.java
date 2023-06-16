@@ -25,12 +25,11 @@ public class VideoController {
 
     @Async
     @PostMapping("/upload")
-    public void uploadVideo(String courseName,@RequestParam("file") MultipartFile file) {
-        String filename = StringUtils.cleanPath(file.getOriginalFilename());
+    public void uploadVideo(String courseName,Long lessonId,@RequestParam("file") MultipartFile file) {
 
         try {
             // Save the video file
-            videoService.saveVideo(courseName,filename,file);
+            videoService.saveVideo(courseName,lessonId,file);
 
         } catch (IOException e) {
             throw new RuntimeException("The video can't be downloaded!");

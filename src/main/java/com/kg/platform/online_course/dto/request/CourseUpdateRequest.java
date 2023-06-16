@@ -7,9 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ProductUpdateRequest {
+public class CourseUpdateRequest {
     private Long productId;
-    private String productName;
+    private String courseName;
     private String description;
     private Double price;
     private Integer amount;

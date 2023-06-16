@@ -28,7 +28,7 @@ public class ReviewController {
     @PostMapping
     public CourseDetailsResponse addFeedback(@RequestBody ReviewRequest request, Principal principal){
         reviewService.createFeedback(request, principal);
-        return courseService.getProductById(request.getProductId());
+        return courseService.getCourseById(request.getProductId());
     }
 
     @Operation(summary = "Delete the feedback", description = "This endpoint returns a deleted feedback")

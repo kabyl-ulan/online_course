@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CourseCreateRequest {
     private long categoryId;
-    private String productName;
+    private String courseName;
     private String description;
     private double price;
     private String author;

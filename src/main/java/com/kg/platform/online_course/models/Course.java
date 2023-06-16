@@ -42,19 +42,21 @@ public class Course {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Category category;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn
+    private Image courseImage;
+
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Review> reviews = new HashSet<>();
 
-    @OneToOne()
-    @JoinColumn
-    private Image courseImage;
 
     @OneToMany(mappedBy = "course",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Lesson> lessons = new ArrayList<>();
 
 
     public Course(CourseCreateRequest request) {
-        this.courseName = request.getProductName();
+        this.courseName = request.getCourseName();
         this.description = request.getDescription();
         this.price = request.getPrice();
         this.uploadDate = LocalDate.now();

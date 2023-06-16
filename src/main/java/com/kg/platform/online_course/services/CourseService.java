@@ -2,13 +2,14 @@ package com.kg.platform.online_course.services;
 
 import com.kg.platform.online_course.api_controller.VideoController;
 import com.kg.platform.online_course.dto.request.CourseCreateRequest;
-import com.kg.platform.online_course.dto.request.ProductUpdateRequest;
+import com.kg.platform.online_course.dto.request.CourseUpdateRequest;
 import com.kg.platform.online_course.dto.response.CourseDetailsResponse;
 import com.kg.platform.online_course.dto.response.ProductResponse;
 import com.kg.platform.online_course.dto.response.SimpleResponse;
 import com.kg.platform.online_course.mappers.CourseMapper;
 import com.kg.platform.online_course.models.Category;
 import com.kg.platform.online_course.models.Course;
+import com.kg.platform.online_course.models.Image;
 import com.kg.platform.online_course.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -49,17 +50,17 @@ public class CourseService {
         return courseRepository.findAllByCategoryIdOrderByUploadDateDesc(categoryId, pageable).map(courseMapper::toProductResponse);
     }
 
-    public CourseDetailsResponse getProductById(Long id) {
+    public CourseDetailsResponse getCourseById(Long id) {
         Course course = courseRepository.findById(id).orElseThrow(() -> new NotFoundException("Product was not found"));
         return courseMapper.toCourseDetailsResponse(course);
     }
 
-    public CourseDetailsResponse updateById(ProductUpdateRequest request) {
+    public CourseDetailsResponse updateById(CourseUpdateRequest request) {
         Course course = courseRepository.findById(request.getProductId()).orElseThrow(() -> new NotFoundException("Product with id=" + request.getProductId() + "not found"));
-        course.setCourseName(request.getProductName());
+        course.setCourseName(request.getCourseName());
         course.setDescription(request.getDescription());
         course.setPrice(request.getPrice());
-        return getProductById(course.getId());
+        return getCourseById(course.getId());
     }
 
     public Page<ProductResponse> deleteById(Long id) {
@@ -72,12 +73,11 @@ public class CourseService {
     }
 
 
-    public CourseDetailsResponse addVideos(Long id, MultipartFile file) {
+    public CourseDetailsResponse addImage(Long id, MultipartFile file) {
         Course course = courseRepository.findById(id).orElseThrow(() -> new NotFoundException("Not found"));
-        videoController.uploadVideo(course.getCourseName(),file);
+        course.setCourseImage(Image.parseImage(file));
         courseRepository.save(course);
         return courseMapper.toCourseDetailsResponse(course);
-
     }
 
 
@@ -116,7 +116,7 @@ public class CourseService {
         return body;
     }
 
-    public Page<ProductResponse> searchProduct(String name, Long categoryId, Pageable pageable) {
+    public Page<ProductResponse> searchCourse(String name, Long categoryId, Pageable pageable) {
         if (categoryId == null) {
             return courseRepository.findByCourseNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(name, name, pageable).map(courseMapper::toProductResponse);
         } else {
