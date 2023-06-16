@@ -6,12 +6,12 @@ import com.kg.platform.online_course.dto.response.SimpleResponse;
 import com.kg.platform.online_course.exceptions.ECommerceException;
 import com.kg.platform.online_course.exceptions.NotFoundException;
 import com.kg.platform.online_course.mappers.CartItemMapper;
-import com.kg.platform.online_course.mappers.ProductMapper;
+import com.kg.platform.online_course.mappers.CourseMapper;
 import com.kg.platform.online_course.models.Cart;
 import com.kg.platform.online_course.models.CartItem;
 import com.kg.platform.online_course.repositories.CartItemRepository;
 import com.kg.platform.online_course.repositories.CartRepository;
-import com.kg.platform.online_course.repositories.ProductRepository;
+import com.kg.platform.online_course.repositories.CourseRepository;
 import com.kg.platform.online_course.repositories.UserRepository;
 
 import lombok.AllArgsConstructor;
@@ -29,10 +29,10 @@ public class CartService {
 
     private final UserRepository userRepository;
     private final CartItemRepository itemRepository;
-    private final ProductRepository productRepo;
+    private final CourseRepository productRepo;
     private final CartRepository cartRepository;
 
-    private final ProductMapper responseMapper;
+    private final CourseMapper responseMapper;
     private final CartItemMapper cartItemMapper;
 
     public CartItem getById(Long id) {
@@ -47,13 +47,13 @@ public class CartService {
             cartRepository.save(cart);
         }
 
-        CartItem cartItem = itemRepository.findByProductIdAndAndCart_Id(productId, cart.getId());
+        CartItem cartItem = null;
         if (cartItem != null && cartItem.getCart() == cart) {
             throw new ECommerceException("This product already add!");
         }
         cartItem = CartItem.builder()
                 .cart(cart)
-                .product(productRepo.findById(productId).orElseThrow())
+                .course(productRepo.findById(productId).orElseThrow())
                 .quantity(1)
                 .build();
         itemRepository.save(cartItem);
@@ -62,9 +62,7 @@ public class CartService {
 
     public SimpleResponse changeQuantity(Long cartItemId, Integer quantity) {
         CartItem cartItem = itemRepository.findById(cartItemId).orElseThrow(NotFoundException::new);
-        if (cartItem.getProduct().getAmount() < quantity) {
-            throw new ECommerceException("The quantity should not be more than product amount!");
-        }
+
         cartItem.setQuantity(quantity);
         itemRepository.saveAndFlush(cartItem);
         return new SimpleResponse("Successfully changed", "CHANGE");

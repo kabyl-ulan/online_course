@@ -4,19 +4,14 @@ import com.kg.platform.online_course.models.Video;
 import com.kg.platform.online_course.services.VideoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -25,52 +20,34 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Tag(name = "Video API", description = "The Video API for all ")
 public class VideoController {
-    private static final String UPLOAD_DIR = "./uploads"; // Directory to store uploaded videos
-
 
     private VideoService videoService;
 
+    @Async
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadVideo(@RequestParam("file") MultipartFile file) {
+    public void uploadVideo(String courseName,@RequestParam("file") MultipartFile file) {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
 
         try {
             // Save the video file
-            videoService.saveVideo(filename, file);
+            videoService.saveVideo(courseName,filename,file);
 
-            return ResponseEntity.ok("Video uploaded successfully!");
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload video.");
+            throw new RuntimeException("The video can't be downloaded!");
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Resource> downloadVideo(@PathVariable("id") Long id) {
+    public String getVideoById(@PathVariable("id") Long id) {
         // Get the video by ID
         Video video = videoService.getVideoById(id);
 
-        if (video != null) {
-            try {
-                // Construct the file path
-                Path filePath = Paths.get(UPLOAD_DIR).resolve(video.getFilename()).normalize();
-                Resource resource = new UrlResource(filePath.toUri());
+        return video != null ? video.getPath() : "There is no video";
 
-                if (resource.exists() && resource.isReadable()) {
-                    return ResponseEntity.ok().body(resource);
-                }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return ResponseEntity.notFound().build();
     }
-
     @GetMapping
-    public ResponseEntity<List<String>> getAllVideoNames() {
+    public List<String> getAllVideoNames() {
         // Retrieve all video names
-        List<String> videoNames = videoService.getAllVideoNames();
-
-        return ResponseEntity.ok(videoNames);
+        return videoService.getAllVideoNames();
     }
 }

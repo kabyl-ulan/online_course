@@ -9,16 +9,7 @@ import lombok.*;
 @Setter
 @Builder
 @Entity
-@NamedEntityGraph(
-        name = "order-item-entity-graph",
-        attributeNodes = {
-                @NamedAttributeNode(value = "product",subgraph = "product-subgraph"),
-        },
-        subgraphs = {
-                @NamedSubgraph(name = "product-subgraph",attributeNodes = {@NamedAttributeNode("imageList")} ),
 
-        }
-)
 public class OrderItem {
     private static final String SEQ_NAME = "order_item_seq";
 
@@ -30,7 +21,7 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
-    private Product product;
+    private Course course;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Order order;

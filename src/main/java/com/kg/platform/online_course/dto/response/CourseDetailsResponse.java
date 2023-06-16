@@ -4,7 +4,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -12,19 +11,15 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDetailsResponse {
+public class CourseDetailsResponse {
     private long id;
     private int price;
-    private int amount;
-    private int sold;
-
     private String category;
-    private String productName;
+    private String courseName;
     private String description;
+    private LocalDate uploadDate;
+    private ImageDto courseImage;
+    private List<LessonResponse> lessons;
 
-    private LocalDate receiptDate;
-
-    private List<ImageDto> imageList;
-    private Set<ReviewResponse> reviews;
 
 }

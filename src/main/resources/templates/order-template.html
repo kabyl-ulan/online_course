@@ -83,10 +83,10 @@
                 </thead>
                 <tbody>
                 <tr th:each="orderItem : ${order.getOrderItems()}">
-                    <td th:text="${orderItem.getProduct().getProductName()}"></td>
+                    <td th:text="${orderItem.getCourse().getCourseName()}"></td>
                     <td th:text="${orderItem.getQuantity()}"></td>
-                    <td th:text="${orderItem.getProduct().getPrice()}"></td>
-                    <td th:text="${orderItem.getProduct().getPrice() * orderItem.getQuantity()}"></td>
+                    <td th:text="${orderItem.getCourse().getPrice()}"></td>
+                    <td th:text="${orderItem.getCourse().getPrice() * orderItem.getQuantity()}"></td>
                 </tr>
 
                 <tr>

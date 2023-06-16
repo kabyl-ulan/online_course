@@ -7,10 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ProductCreateRequest {
+public class CourseCreateRequest {
     private long categoryId;
     private String productName;
     private String description;
     private double price;
-    private int amount;
+    private String author;
 }

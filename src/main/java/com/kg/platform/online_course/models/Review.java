@@ -28,5 +28,5 @@ public class Review {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn()
-    private Product product;
+    private Course course;
 }

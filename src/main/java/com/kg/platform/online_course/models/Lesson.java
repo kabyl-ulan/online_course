@@ -1,4 +1,5 @@
 package com.kg.platform.online_course.models;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,17 +11,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Video {
-
+public class Lesson {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String path;
-    private Long videDuration;
-    // Constructors, getters, and setters
-    @OneToOne(fetch = FetchType.LAZY)
+    private String title;
+    @OneToOne
+    private Video video;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn()
-    private Lesson lesson;
-
-
+    private Course course;
 }

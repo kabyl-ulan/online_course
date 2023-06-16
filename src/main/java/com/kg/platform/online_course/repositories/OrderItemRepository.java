@@ -11,8 +11,8 @@ import java.util.List;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem,Long> {
     @Modifying
-    @Query("DELETE FROM OrderItem o where o.product.id = :productId")
-    void deleteByProductId(Long productId);
+//    @Query("DELETE FROM OrderItem o where o.product.id = :productId")
+    void deleteByCourseId(Long courseId);
 
 
     @EntityGraph(value = "order-item-entity-graph")

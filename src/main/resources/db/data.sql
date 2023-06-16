@@ -14,29 +14,15 @@ VALUES (1, 'Английский язык', null),
        (7, 'Node', 5),
        (8, 'Python', 5);
 
-insert into products (id, amount, description, price, product_name, category_id)
-VALUES (1, 5, 'Iphone 14 pro 256g', 1000, 'Iphone 14', 2),
-       (2, 4, 'Iphone 13 pro 256g', 800, 'Iphone 13', 2),
-       (3, 3, 'Iphone 12 pro 256g', 600, 'Iphone 12', 2),
-       (4, 3, 'MacBook pro 256g', 1500, 'macbook', 3),
-       (5, 4, 'MacBook pro 2  256g', 1800, 'macbook 2', 3),
-       (6, 5, 'MacBook pro 3  256g', 2100, 'macbook 3', 3),
-       (7, 7, 'HP 1999x1200', 700, 'HP', 4),
-       (8, 8, 'LG 1999x1200', 750, 'LG', 4),
-       (9, 6, 'Samsung 1999x1200', 850, 'Samsung', 4);
+insert into course (id, lessons_number, description, price, course_name, category_id)
+VALUES (1, 5, 'This course will teach about English', 1000, 'Pre-Intermediate English', 1),
+        (2, 6, 'This full tutorial about Java core', 1000, 'Java Core', 1);
 
 
 
-insert into carts (id, user_id)
-VALUES (1, 2);
 
-insert into cart_items (id, quantity, cart_id, product_id)
-VALUES (1, 1, 1, 3),
-       (2, 2, 1, 5),
-       (3, 3, 1, 9);
 
-insert into reviews (id, date, text, product_id, user_id)
-VALUES (1, '2022-12-10', 'This is the best picture in my opinion', 9, 2),
-       (2, '2022-12-10', 'This is so good', 8, 2),
-       (3, '2022-12-10', 'This is the best ', 7, 2),
-       (4, '2022-12-10', 'This is the best product', 6, 2);
+
+insert into reviews (id, date, text, course_id, user_id)
+VALUES (1, '2022-12-10', 'This is the best picture in my opinion', 1, 2),
+       (2, '2022-12-10', 'This is so good', 2, 1);

@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
-    private final ProductService productService;
+    private final CourseService courseService;
     private CategoryMapper categoryMapper;
 
 
@@ -71,10 +71,10 @@ public class CategoryService {
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Not found"));
         if (category.getParentCategory() != null) {
-            category.getProducts().forEach(p -> productService.deleteById(p.getId()));
+            category.getCourses().forEach(p -> courseService.deleteById(p.getId()));
         } else {
             category.getCategories().forEach(c ->
-                    c.getProducts().forEach(p -> productService.deleteById(p.getId()))
+                    c.getCourses().forEach(p -> courseService.deleteById(p.getId()))
             );
         }
         categoryRepository.delete(category);

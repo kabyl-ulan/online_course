@@ -56,5 +56,5 @@ public class Category {
     private List<Category> categories;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Product> products;
+    private List<Course> courses;
 }

@@ -2,12 +2,12 @@ package com.kg.platform.online_course.api_controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.kg.platform.online_course.dto.request.ProductCreateRequest;
+import com.kg.platform.online_course.dto.request.CourseCreateRequest;
 import com.kg.platform.online_course.dto.request.ProductUpdateRequest;
-import com.kg.platform.online_course.dto.response.ProductDetailsResponse;
+import com.kg.platform.online_course.dto.response.CourseDetailsResponse;
 import com.kg.platform.online_course.dto.response.ProductResponse;
 import com.kg.platform.online_course.dto.response.SimpleResponse;
-import com.kg.platform.online_course.services.ProductService;
+import com.kg.platform.online_course.services.CourseService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,38 +29,39 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @AllArgsConstructor
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Tag(name = "Product API", description = "The products API for all ")
-public class ProductController {
-    private final ProductService productService;
+public class CourseController {
+    private final CourseService courseService;
+    private VideoController videoController;
 
 
     @Operation(summary = "Get main page",
             description = "This endpoint returns a list of popular and most sold products")
     @GetMapping
     public Map<String, List<ProductResponse>> getMainPage() {
-        return productService.getMainPage();
+        return courseService.getMainPage();
     }
 
     @Operation(summary = "Post the new product",
             description = "This endpoint returns a new created product with all products")
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @PostMapping(path = "/add")
-    public SimpleResponse addProduct(@RequestBody ProductCreateRequest request) {
-        return productService.create(request);
+    public SimpleResponse addProduct(@RequestBody CourseCreateRequest request) {
+        return courseService.create(request);
     }
 
     @Operation(summary = "Add image to product",
             description = "This endpoint returns a new created product with all products")
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @PostMapping(path = "/{id}/add-image", consumes = {"multipart/form-data"})
-    public ResponseEntity<ProductDetailsResponse> addImage(@PathVariable Long id, @RequestParam("file") MultipartFile[] files) {
-        return new ResponseEntity<>(productService.addImages(id, files), HttpStatus.OK);
+    public ResponseEntity<CourseDetailsResponse> addVideo(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<>(courseService.addVideos(id, file), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete image from product", description = "This endpoint delete image from product")
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @DeleteMapping(path = "/{id}/delete")
-    public ResponseEntity<ProductDetailsResponse> deleteImage(@PathVariable(name = "id") Long productId, Long imageId) {
-        return new ResponseEntity<>(productService.deleteImage(productId, imageId), HttpStatus.OK);
+    public ResponseEntity<CourseDetailsResponse> deleteImage(@PathVariable(name = "id") Long productId, Long imageId) {
+        return new ResponseEntity<>(courseService.deleteImage(productId, imageId), HttpStatus.OK);
     }
 
 
@@ -71,14 +72,14 @@ public class ProductController {
             @PathVariable Long categoryId,
             @PageableDefault(sort = {"id"}, direction = DESC) Pageable pageable
     ) {
-        return productService.getAllProductsByCategoryId(categoryId, pageable);
+        return courseService.getAllProductsByCategoryId(categoryId, pageable);
     }
 
     @Operation(summary = "Get a product by id",
             description = "This endpoint returns product by product id")
     @GetMapping("/{id}")
-    public ProductDetailsResponse getProductById(@PathVariable Long id) {
-        return productService.getProductById(id);
+    public CourseDetailsResponse getProductById(@PathVariable Long id) {
+        return courseService.getProductById(id);
     }
 
 
@@ -86,8 +87,8 @@ public class ProductController {
             description = "This endpoint returns a updated product with all products")
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @PatchMapping
-    public ProductDetailsResponse updateProductById(@RequestBody ProductUpdateRequest request) {
-        return productService.updateById(request);
+    public CourseDetailsResponse updateProductById(@RequestBody ProductUpdateRequest request) {
+        return courseService.updateById(request);
     }
 
     @Operation(summary = "Delete the product",
@@ -95,7 +96,7 @@ public class ProductController {
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @DeleteMapping("/{id}")
     public Page<ProductResponse> deleteProductById(@PathVariable Long id) {
-        return productService.deleteById(id);
+        return courseService.deleteById(id);
     }
 
     @Operation(summary = "Search by product name or description",
@@ -106,6 +107,6 @@ public class ProductController {
             @RequestParam(required = false) Long categoryId,
             @PageableDefault(sort = {"id"}, direction = DESC) Pageable pageable
     ) {
-        return productService.searchProduct(name, categoryId, pageable);
+        return courseService.searchProduct(name, categoryId, pageable);
     }
 }

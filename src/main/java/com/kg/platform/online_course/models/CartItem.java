@@ -10,34 +10,14 @@ import lombok.*;
 @Entity
 @Table(name = "cart_items")
 @Builder
-@NamedEntityGraph(
-        name = "cart-item-entity-graph",
-        attributeNodes = {
-                @NamedAttributeNode(value = "product", subgraph = "product-entity-graph"),
-        },
-        subgraphs = {
-                @NamedSubgraph(
-                        name = "product-entity-graph",
-                        attributeNodes = {
-                                @NamedAttributeNode("imageList")
-                        }
-                )
 
-        }
-)
 @NamedEntityGraph(
         name = "cart-item-entity-graph-with-cart",
         attributeNodes = {
-                @NamedAttributeNode(value = "product", subgraph = "product-entity-graph"),
                 @NamedAttributeNode(value = "cart",subgraph = "cart-subgraph")
         },
         subgraphs = {
-                @NamedSubgraph(
-                        name = "product-entity-graph",
-                        attributeNodes = {
-                                @NamedAttributeNode("imageList")
-                        }
-                ),
+
                 @NamedSubgraph(
                         name = "cart-subgraph",
                         attributeNodes = {
@@ -57,12 +37,12 @@ public class CartItem {
     private Integer quantity;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
-    private Product product;
+    private Course course;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Cart cart;
     public Double evalTotalPrice() {
-        return getProduct().getPrice() * quantity;
+        return getCourse().getPrice() * quantity;
     }
 
 }

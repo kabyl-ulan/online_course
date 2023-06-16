@@ -28,7 +28,7 @@ public class Image {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn()
-    private Product product;
+    private Course course;
     public Image(byte[] imageData, String fileType) {
         this.imageData = imageData;
         this.fileType = fileType;

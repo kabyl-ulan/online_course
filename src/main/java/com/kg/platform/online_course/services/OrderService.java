@@ -8,14 +8,14 @@ import com.kg.platform.online_course.exceptions.ECommerceException;
 import com.kg.platform.online_course.exceptions.NotFoundException;
 import com.kg.platform.online_course.mappers.OrderItemMapper;
 import com.kg.platform.online_course.mappers.OrderMapper;
+import com.kg.platform.online_course.models.Course;
 import com.kg.platform.online_course.models.Order;
 import com.kg.platform.online_course.models.OrderItem;
-import com.kg.platform.online_course.models.Product;
 import com.kg.platform.online_course.models.User;
 import com.kg.platform.online_course.models.enums.OrderStatus;
 import com.kg.platform.online_course.repositories.OrderItemRepository;
 import com.kg.platform.online_course.repositories.OrderRepository;
-import com.kg.platform.online_course.repositories.ProductRepository;
+import com.kg.platform.online_course.repositories.CourseRepository;
 import com.kg.platform.online_course.util.InvoiceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class OrderService {
     private UserService userService;
     private OrderRepository orderRepository;
     private OrderItemRepository orderItemRepository;
-    private ProductRepository productRepository;
+    private CourseRepository courseRepository;
 
     private CartService cartService;
     private OrderMapper orderMapper;
@@ -107,13 +107,11 @@ public class OrderService {
 
         List<OrderItem> orderItems = orderRequest.getOrderItems().stream()
                 .map(orderItem -> {
-                    Product product = productRepository.findById(orderItem.getProductId()).orElseThrow(NotFoundException::new);
-                    if (product.getAmount() < orderItem.getQuantity())
-                        throw new ECommerceException("Not enough product in stock");
+                    Course course = courseRepository.findById(orderItem.getProductId()).orElseThrow(NotFoundException::new);
                     return OrderItem.builder()
-                            .product(product)
+                            .course(course)
                             .quantity(orderItem.getQuantity())
-                            .totalPrice(product.getPrice() * orderItem.getQuantity())
+                            .totalPrice(course.getPrice() * orderItem.getQuantity())
                             .build();
                 }).toList();
 
@@ -181,19 +179,10 @@ public class OrderService {
     @Transactional
     public void soldProducts(List<OrderItem> orderItems, boolean toSell) {
         for (OrderItem orderItem : orderItems) {
-            Product product = orderItem.getProduct();
+            Course course = orderItem.getCourse();
 
             int quantity = orderItem.getQuantity();
-            int sold = product.getSold();
-            int amount = product.getAmount();
 
-            if (toSell) {
-                product.setAmount(amount - quantity);
-                product.setSold(sold + quantity);
-            } else {
-                product.setAmount(amount + quantity);
-                product.setSold(sold - quantity);
-            }
 
         }
 

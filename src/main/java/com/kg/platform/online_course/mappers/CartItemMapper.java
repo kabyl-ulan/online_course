@@ -5,11 +5,10 @@ import com.kg.platform.online_course.models.CartItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring",uses = { ProductMapper.class})
+@Mapper(componentModel = "spring",uses = { CourseMapper.class})
 public interface CartItemMapper {
     @Mapping(target = "totalPrice", expression = "java(cartItem.evalTotalPrice())")
     @Mapping(target = "cartItemId", source = "id")
-    @Mapping(target = "productResponse", source = "product")
     CartItemResponse toCartItemResponse(CartItem cartItem);
 
 
