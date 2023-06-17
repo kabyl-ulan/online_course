@@ -33,7 +33,7 @@ public class LessonService {
 
         course.getLessons().add(lesson);
 
-        lessonRepository.save(lesson);
+        lessonRepository.saveAndFlush(lesson);
         courseRepository.save(course);
 
         videoService.saveVideo(course.getCourseName(),lesson.getId(),file);
@@ -64,8 +64,7 @@ public class LessonService {
         lesson.setTitle(title);
         if (file != null && !file.isEmpty()) {
             String courseName = lesson.getCourse().getCourseName();
-
-            videoService.saveVideo(courseName,lessonId,file);
+            videoService.updateVideo(lesson,courseName,file);
         }
         lessonRepository.save(lesson);
 

@@ -17,7 +17,7 @@ public class LessonController {
 
     @Operation(summary = "Upload new lesson", description = "This endpoint upload new lesson to Course")
     @PostMapping("/upload")
-    public void upload (Long courseId, String title,@RequestParam("file") MultipartFile file) {
+    public void upload (@RequestParam Long courseId, @RequestParam String title,@RequestParam("file") MultipartFile file) {
         lessonService.uploadLesson(courseId,title,file);
     }
 
@@ -27,10 +27,10 @@ public class LessonController {
         return lessonService.getById(id);
     }
 
-    @Operation(summary = "Updte lesson by Id", description = "This endpoint return updated lesson by Id")
-    @GetMapping("/{id}")
-    public LessonResponse updateById(Long lessonId, String title,@RequestParam("file") MultipartFile file) {
-        return lessonService.updateById(lessonId,title,file);
+    @Operation(summary = "Update lesson by Id", description = "This endpoint return updated lesson by Id")
+    @PatchMapping("/{id}")
+    public LessonResponse updateById(@PathVariable Long id, @RequestParam String  title,@RequestParam("file") MultipartFile file) {
+        return lessonService.updateById(id,title,file);
     }
     @Operation(summary = "Delete lesson by Id", description = "This endpoint delete lesson by Id")
     @DeleteMapping("/{id}")

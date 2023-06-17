@@ -23,7 +23,6 @@ public class Lesson {
     @OneToOne( fetch = FetchType.EAGER,cascade = CascadeType.ALL,orphanRemoval = true)
     private Video video;
 
-    private String path;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn()
     private Course course;

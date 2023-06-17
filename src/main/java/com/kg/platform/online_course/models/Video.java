@@ -11,16 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Video {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String path;
-    private Long videDuration;
-    // Constructors, getters, and setters
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn()
-    private Lesson lesson;
-
 
 }
